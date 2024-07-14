@@ -1,0 +1,31 @@
+openapi: 3.0.0
+info:
+  title: Simple API 2
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      summary: Get list of products
+      operationId: getProducts
+      tags:
+        - Product
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Sample Product"

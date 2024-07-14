@@ -1,0 +1,21 @@
+{
+  "name": "prism-mock-server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@stoplight/prism-cli": "^5.8.2",
+    "@stoplight/prism-http-server": "^5.8.2",
+    "@stoplight/yaml": "^4.3.0",
+    "express": "^4.19.2",
+    "http-proxy-middleware": "^3.0.0"
+  },
+  "type": "module"
+}

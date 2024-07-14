@@ -1,0 +1,64 @@
+openapi: 3.0.0
+info:
+  title: Simple API
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      summary: Get list of users
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      x-custom-logic:
+        type: conditionalResponse
+        conditions:
+          - field: name
+            value: special
+            response:
+              id: 999
+              name: Special User
+          - field: role.role
+            value: admin
+            response:
+              id: 1000
+              name: Admin User
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "John Doe"
+        Role:
+          $ref: '#/components/schemas/Role'
+    Role:
+      type: object
+      properties:
+        role:
+          type: string
+          example: Developer
