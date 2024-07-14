@@ -1,14 +1,17 @@
 openapi: 3.0.0
 info:
-  title: Simple API
+  title: Simple API 1
   version: 1.0.0
 paths:
   /users:
     get:
-      summary: Get list of users
+      operationId: listUsers
+      summary: List users
+      tags:
+        - User
       responses:
         '200':
-          description: A list of users
+          description: User created successfully
           content:
             application/json:
               schema:
@@ -16,7 +19,10 @@ paths:
                 items:
                   $ref: '#/components/schemas/User'
     post:
-      summary: Create a new user
+      summary: Create a user
+      operationId: createUser
+      tags:
+        - User
       requestBody:
         required: true
         content:
@@ -33,16 +39,35 @@ paths:
       x-custom-logic:
         type: conditionalResponse
         conditions:
-          - field: name
-            value: special
-            response:
-              id: 999
-              name: Special User
-          - field: role.role
-            value: admin
+          - type: or
+            rules:
+              - field: name
+                value: special
+                caseSensitive: false
+              - field: metadata.role
+                value: admin
             response:
               id: 1000
               name: Admin User
+          - type: and
+            rules:
+              - field: name
+                value: John
+                caseSensitive: true
+              - field: metadata.role
+                value: manager
+                operator: eq
+            response:
+              id: 1001
+              name: Manager User
+          - type: and
+            rules:
+              - field: age
+                value: 30
+                operator: lte
+            response:
+              id: 1002
+              name: Age 30 or below User
 components:
   schemas:
     User:
@@ -54,11 +79,12 @@ components:
         name:
           type: string
           example: "John Doe"
-        Role:
-          $ref: '#/components/schemas/Role'
-    Role:
-      type: object
-      properties:
-        role:
-          type: string
-          example: Developer
+        metadata:
+          type: object
+          properties:
+            role:
+              type: string
+              example: "user"
+        age:
+          type: integer
+          example: 25
