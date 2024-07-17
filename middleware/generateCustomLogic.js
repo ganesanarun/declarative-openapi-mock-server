@@ -25,10 +25,27 @@ const evaluateRule = (value, rule) => {
 };
 
 const evaluateCondition = (req, condition) => {
+    const evaluateRuleByLocation = (location, field, rule) => {
+        let value;
+        switch (location) {
+            case 'header':
+                value = req.headers[field.toLowerCase()];
+                break;
+            case 'query':
+                value = req.query[field];
+                break;
+            case 'body':
+            default:
+                value = _.get(req.body, field);
+                break;
+        }
+        return evaluateRule(value, rule);
+    };
+
     if (condition.type === 'and') {
-        return condition.rules.every(rule => evaluateRule(_.get(req.body, rule.field), rule));
+        return condition.rules.every(rule => evaluateRuleByLocation(rule.location, rule.field, rule));
     } else if (condition.type === 'or') {
-        return condition.rules.some(rule => evaluateRule(_.get(req.body, rule.field), rule));
+        return condition.rules.some(rule => evaluateRuleByLocation(rule.location, rule.field, rule));
     }
     return false;
 };
@@ -62,7 +79,8 @@ const generateCustomLogicMiddleware = () => {
             if (logic.type === 'conditionalResponse') {
                 const matchedCondition = logic.conditions.find(condition => evaluateCondition(req, condition));
                 if (matchedCondition) {
-                    return res.json(matchedCondition.response);
+                    const { statusCode = 200, body = {}, headers = {} } = matchedCondition.response;
+                    return res.status(statusCode).set(headers).json(body);
                 }
             }
         }

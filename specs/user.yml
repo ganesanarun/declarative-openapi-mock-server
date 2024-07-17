@@ -47,8 +47,9 @@ paths:
               - field: metadata.role
                 value: admin
             response:
-              id: 1000
-              name: Admin User
+              body:
+                id: 1000
+                name: Admin User
           - type: and
             rules:
               - field: name
@@ -58,16 +59,25 @@ paths:
                 value: manager
                 operator: eq
             response:
-              id: 1001
-              name: Manager User
+              body:
+                id: 1001
+                name: Manager User
           - type: and
             rules:
               - field: age
                 value: 30
                 operator: lte
             response:
-              id: 1002
-              name: Age 30 or below User
+              statusCode: 201
+              body: {
+                      "id": 1002,
+                      "name": "Age 30 or below User",
+                      "metadata": {
+                         "age": 25
+                      }
+                    }
+              headers:
+                X-Custom-Header: manager_value
 components:
   schemas:
     User:
