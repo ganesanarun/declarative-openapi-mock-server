@@ -1,18 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import { parse } from '@stoplight/yaml';
-import { fileURLToPath } from 'url';
 import _ from 'lodash';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { loadSpecs } from '../common/core.js';
 
-const loadSpecs = () => {
-    const specsDir = path.join(__dirname, '../specs');
-    const files = fs.readdirSync(specsDir).filter(file => file.endsWith('.yaml') || file.endsWith('.yml'));
-    const specs = files.map(file => parse(fs.readFileSync(path.join(specsDir, file), 'utf8')));
-    return specs;
-};
 
 const evaluateRule = (value, rule) => {
     if (rule.caseSensitive === false && typeof value === 'string' && typeof rule.value === 'string') {
@@ -45,7 +34,7 @@ const evaluateCondition = (req, condition) => {
 };
 
 const generateCustomLogicMiddleware = () => {
-    const specs = loadSpecs();
+    const specs = loadSpecs('../specs');
     const customLogic = [];
 
     specs.forEach(spec => {
