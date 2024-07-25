@@ -70,12 +70,50 @@ paths:
             response:
               statusCode: 201
               body: {
-                      "id": 1002,
-                      "name": "Age 30 or below User",
-                      "metadata": {
-                         "age": 25
-                      }
-                    }
+                "id": 1002,
+                "name": "Age 30 or below User",
+                "metadata": {
+                  "age": 25
+                }
+              }
+              headers:
+                X-Custom-Header: manager_value
+  /users/{id}:
+    get:
+      operationId: getUserById
+      summary: Get user by ID
+      tags:
+        - User
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      x-custom-logic:
+        type: conditionalResponse
+        conditions:
+          - type: or
+            rules:
+              - field: id
+                value: 1
+                location: path
+                operator: eq
+              - field: id
+                value: 2
+                location: path
+            response:
+              body:
+                id: 1000
+                name: Admin User
               headers:
                 X-Custom-Header: manager_value
 components:
@@ -97,4 +135,4 @@ components:
               example: "user"
         age:
           type: integer
-          example: 25
+          example: 125

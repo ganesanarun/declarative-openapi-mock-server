@@ -1,16 +1,17 @@
 # Declarative OpenAPI Mock Server
 
-This project provides a declarative OpenAPI mock server with conditional responses, supporting rules such as "and" and "or" conditions, case sensitivity, and comparison operators.
+This project provides a declarative OpenAPI mock server with conditional responses, supporting rules such as "and" and "
+or" conditions, case sensitivity, and comparison operators.
 
 ## Features
 
 - Declarative configuration using OpenAPI specifications
-- Conditional responses based on request payload, query and headers
+- Conditional responses based on request payload, query and headers, path parameters
 - Supports "and" / "or" conditions
 - Case sensitivity and comparison operators (e.g., `eq`, `lt`, `lte`, `gt`, `gte`)
 - Default random success response according to OpenAPI spec when no custom logic is specified
 
-> Note: Since yaml is superset of json, you could put json body directly.
+> Note: Since yaml is a superset of json, you could put json body directly.
 
 ## Prerequisites
 
@@ -34,7 +35,8 @@ This project provides a declarative OpenAPI mock server with conditional respons
 
 ## Usage
 
-1. Place your OpenAPI specification files in the `specs` directory. Ensure each spec file has the custom logic defined under `x-custom-logic`.
+1. Place your OpenAPI specification files in the `specs` directory. Ensure each spec file has the custom logic defined
+   under `x-custom-logic`.
 2. Run the mock server:
 
    ```sh
@@ -121,12 +123,12 @@ paths:
             response:
               statusCode: 201
               body: {
-                      "id": 1002,
-                      "name": "Age 30 or below User",
-                      "metadata": {
-                         "age": 25
-                      }
-                    }
+                "id": 1002,
+                "name": "Age 30 or below User",
+                "metadata": {
+                  "age": 25
+                }
+              }
               headers:
                 X-Custom-Header: manager_value
           - type: and
@@ -164,15 +166,18 @@ components:
 
 ## Custom Logic Configuration
 
-The `x-custom-logic` attribute allows you to define custom conditional responses. Each condition can contain multiple rules that are either `and` or `or` conditions. Each rule specifies:
+The `x-custom-logic` attribute allows you to define custom conditional responses.
+Each condition can contain multiple rules that are either `and` or `or` conditions.
+Each rule specifies:
 
-- `location`: The part of the request to evaluate (`body`, `header`, `query`).
+- `location`: The part of the request to evaluate (`body`, `header`, `query`, 'path').
 - `field`: The field to match.
 - `value`: The value to compare against.
 - `caseSensitive`: Whether the comparison is case-sensitive.
 - `operator`: The comparison operator (`eq`, `lt`, `lte`, `gt`, `gte`).
 
-The response section of each condition specifies the `statusCode`, `body`, and `headers` to return if the condition is met.
+The response section of each condition specifies the `statusCode`, `body`, and `headers` to return if the condition is
+met.
 
 ## Example
 
@@ -207,6 +212,6 @@ with headers:
 
 if the request matches the first condition in `x-custom-logic`.
 
-If the request matches no custom logic conditions, a random success response according to the OpenAPI specification will be returned.
-
----
+If the request matches no custom logic conditions,
+a random success response, according to the OpenAPI specification, will
+be returned.

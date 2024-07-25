@@ -1,1 +1,29 @@
 node_modules/
+
+
+# compiled output
+dist
+node_modules
+.history
+.env
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+newrelic_agent.log*
+
+# OS
+.DS_Store
+
+# IDE - VSCode
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IDE - Idea
+.idea
+

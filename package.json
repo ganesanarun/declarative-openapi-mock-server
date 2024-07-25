@@ -12,10 +12,13 @@
   "description": "",
   "dependencies": {
     "@stoplight/prism-cli": "^5.8.2",
+    "@stoplight/prism-core": "^5.8.0",
     "@stoplight/prism-http-server": "^5.8.2",
     "@stoplight/yaml": "^4.3.0",
     "express": "^4.19.2",
-    "http-proxy-middleware": "^3.0.0"
+    "http-proxy-middleware": "^3.0.0",
+    "lodash": "^4.17.21",
+    "path-to-regexp": "^7.1.0"
   },
   "type": "module"
 }

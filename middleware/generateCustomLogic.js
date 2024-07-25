@@ -1,6 +1,7 @@
 import _ from 'lodash';
+import {match} from 'path-to-regexp';
 
-import { loadSpecs } from '../common/core.js';
+import {loadSpecs} from '../common/core.js';
 
 
 const evaluateRule = (value, rule) => {
@@ -8,6 +9,22 @@ const evaluateRule = (value, rule) => {
         value = value.toLowerCase();
         rule.value = rule.value.toLowerCase();
     }
+
+    const convertType = (val, targetType) => {
+        switch (targetType) {
+            case 'integer':
+                return parseInt(val, 10);
+            case 'number':
+                return parseFloat(val);
+            case 'boolean':
+                return val === 'true' || val === true;
+            default:
+                return val;
+        }
+    };
+
+    const targetType = typeof rule.value;
+    value = convertType(value, targetType);
 
     switch (rule.operator) {
         case 'lte':
@@ -34,6 +51,9 @@ const evaluateCondition = (req, condition) => {
             case 'query':
                 value = req.query[field];
                 break;
+            case 'path':
+                value = req.pathParams[field];
+                break;
             case 'body':
             default:
                 value = _.get(req.body, field);
@@ -50,6 +70,7 @@ const evaluateCondition = (req, condition) => {
     return false;
 };
 
+
 const generateCustomLogicMiddleware = () => {
     const specs = loadSpecs('../specs');
     const customLogic = [];
@@ -59,7 +80,7 @@ const generateCustomLogicMiddleware = () => {
             Object.entries(methods).forEach(([method, details]) => {
                 if (details['x-custom-logic']) {
                     customLogic.push({
-                        path,
+                        pathMatcher: match(path.replace(/{/g, ':').replace(/}/g, '')),
                         method: method.toUpperCase(),
                         logic: details['x-custom-logic']
                     });
@@ -69,17 +90,18 @@ const generateCustomLogicMiddleware = () => {
     });
 
     return (req, res, next) => {
-        const matchingLogic = customLogic.find(logic =>
-            logic.path === req.path && logic.method === req.method
-        );
+        const matchingLogic = customLogic.find(logic => {
+            return logic.pathMatcher(req.path) && logic.method === req.method
+        });
 
         if (matchingLogic) {
-            const { logic } = matchingLogic;
+            const {logic, pathMatcher} = matchingLogic;
 
             if (logic.type === 'conditionalResponse') {
+                req.pathParams = pathMatcher(req.path).params
                 const matchedCondition = logic.conditions.find(condition => evaluateCondition(req, condition));
                 if (matchedCondition) {
-                    const { statusCode = 200, body = {}, headers = {} } = matchedCondition.response;
+                    const {statusCode = 200, body = {}, headers = {}} = matchedCondition.response;
                     return res.status(statusCode).set(headers).json(body);
                 }
             }
