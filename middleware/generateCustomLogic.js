@@ -23,6 +23,24 @@ const evaluateRule = (value, rule) => {
         }
     };
 
+     // Handle array conditions
+    const evaluateArrayCondition = (arrayValue, rule) => {
+        switch (rule.arrayOperator) {
+            case 'contains':
+                return arrayValue.includes(rule.value);
+            case 'any':
+                return arrayValue.some(val => evaluateRule(val, { ...rule, arrayOperator: undefined }));
+            case 'all':
+                return arrayValue.every(val => evaluateRule(val, { ...rule, arrayOperator: undefined}));
+            default:
+                return false;
+        }
+    };
+
+     if (Array.isArray(value)) {
+         return evaluateArrayCondition(value, rule);
+     }
+
     const targetType = typeof rule.value;
     value = convertType(value, targetType);
 

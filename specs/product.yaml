@@ -18,6 +18,45 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
+    post:
+      summary: create products
+      operationId: createProducts
+      tags:
+        - Product
+      requestBody:
+        description: Create a new pet in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDraft'
+        required: true
+      responses:
+        '200':
+          description: A list of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+      x-custom-logic:
+        type: conditionalResponse
+        conditions:
+          - type: or
+            rules:
+              - field: categories
+                value: 100
+                location: body
+                operator: lte
+                arrayOperator: all
+              - field: categories
+                value: 199
+                location: body
+                arrayOperator: contains
+            response:
+              body: {
+                "id": 1,
+                "name": "Sample Product",
+                "categories": [ 100, 101, 102 ]
+              }
 components:
   schemas:
     Product:
@@ -29,3 +68,19 @@ components:
         name:
           type: string
           example: "Sample Product"
+        categories:
+          type: array
+          items:
+            type: integer
+          example: [ 1, 2, 3 ]
+    ProductDraft:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Sample Product"
+        categories:
+          type: array
+          items:
+            type: integer
+          example: [ 1, 5, 6 ]
