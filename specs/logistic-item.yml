@@ -37,7 +37,8 @@ paths:
                   "nodeCode": "100"
                 }
                 location: body
-                arrayOperator: any
+                arrayOperator: indexOf
+                index: 0
                 operator: match
             response:
               body: {

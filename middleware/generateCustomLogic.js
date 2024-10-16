@@ -28,6 +28,8 @@ const evaluateRule = (value, rule) => {
         switch (rule.arrayOperator) {
             case 'contains':
                 return arrayValue.includes(rule.value);
+            case 'indexOf':
+                return evaluateRule(arrayValue[rule.index], { ...rule, arrayOperator: undefined });
             case 'any':
                 return arrayValue.some(val => evaluateRule(val, { ...rule, arrayOperator: undefined }));
             case 'all':
