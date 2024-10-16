@@ -1,0 +1,255 @@
+openapi: 3.0.3
+info:
+  title: Logistic Item command - OpenAPI 3.0
+  version: '0.1'
+paths:
+  /v1/logistic-items/available-shipping-options:
+    post:
+      operationId: getShippingOptions
+      x-new-relic-transaction-name: "POST /v1/logistic-items/shipping-options"
+      tags:
+        - LogisticItemCommand
+      summary: Get shipping options for given Item Id and node code combinations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemShippingOptionsDraft'
+      responses:
+        '200':
+          description: Returns all available shipping options for given item ID and node combinations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemShippingOptionsRepresentation'
+        '400':
+          description: Invalid input
+        '404':
+          description: None of the logistic items are found
+      x-custom-logic:
+        type: conditionalResponse
+        conditions:
+          - type: or
+            rules:
+              - field: items
+                value: {
+                  "id": "146711002",
+                  "nodeCode": "100"
+                }
+                location: body
+                arrayOperator: any
+                operator: eq
+            response:
+              body: {
+                "meta": {
+                  "businessUnit": "IT WORKS",
+                  "countryCode": "CL",
+                  "expiresAt": "2024-10-09T12:00:00Z"
+                },
+                "items": [
+                  {
+                    "id": "test",
+                    "nodeCode": "100",
+                    "nodeType": "RETAIL",
+                    "nodeCategory": "WAREHOUSE",
+                    "nodeAdmin": "PARIS",
+                    "availableLogisticModels": [
+                      "OWNED"
+                    ],
+                    "availableShippingCapabilities": [
+                      "HOME_DELIVERY",
+                      "CLICK_AND_COLLECT"
+                    ],
+                    "availableShippingOptions": [
+                      {
+                        "shippingType": "DELIVERY",
+                        "shippingSubType": "HOME",
+                        "shippingMethods": [
+                          "SCHEDULED"
+                        ]
+                      },
+                      {
+                        "shippingType": "COLLECT",
+                        "shippingSubType": "IN_STORE",
+                        "shippingMethods": [
+                          "SCHEDULED"
+                        ]
+                      }
+                    ],
+                    "sellerType": "1P"
+                  }
+                ]
+              }
+components:
+  schemas:
+    SellerType:
+      type: string
+      enum: [ 1P, 3P ]
+    LogisticSize:
+      type: string
+      enum: [ SMALL, MEDIUM, LARGE, EXTRA_LARGE ]
+    ProductClassification:
+      type: string
+      enum: [ REGULAR, BUNDLE, SERVICES, INTANGIBLE, SAMPLING, PRESALES ]
+    BundleComponents:
+      type: object
+      properties:
+        itemId:
+          type: string
+        productClassification:
+          type: string
+        quantity:
+          $ref: '#/components/schemas/Quantity'
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: number
+          format: double
+          example: 100.50
+        unitOfMeasure:
+          $ref: '#/components/schemas/UnitOfMeasure'
+    UnitOfMeasure:
+      type: string
+      enum: [ UNITS ]
+      example: UNITS
+    ItemShippingOptionsDraft:
+      type: object
+      required:
+        - meta
+        - items
+      properties:
+        meta:
+          $ref: '#/components/schemas/ShippingOptionsMeta'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingOptionsItem'
+    ShippingOptionsMeta:
+      type: object
+      required:
+        - businessUnit
+        - countryCode
+      properties:
+        businessUnit:
+          type: string
+        countryCode:
+          type: string
+        date:
+          type: string
+          format: date-time
+    ShippingOptionsItem:
+      type: object
+      required:
+        - id
+        - nodeCode
+      properties:
+        id:
+          type: string
+        nodeCode:
+          type: string
+    ItemsShippingOptionsRepresentation:
+      type: object
+      required:
+        - meta
+        - items
+      properties:
+        meta:
+          $ref: '#/components/schemas/ShippingOptionsMeta'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemShippingOptionsRepresentation'
+    ItemShippingOptionsRepresentation:
+      type: object
+      required:
+        - id
+        - nodeCode
+        - nodeType
+        - nodeCategory
+        - nodeAdmin
+        - availableLogisticModels
+        - availableShippingCapabilities
+        - availableShippingOptions
+        - sellerType
+        - logisticSize
+        - productClassification
+      properties:
+        id:
+          type: string
+        nodeCode:
+          type: string
+        nodeType:
+          type: string
+          enum: [ RETAIL, SELLER, 3PL, PROVIDER ]
+          example: RETAIL
+        nodeCategory:
+          type: string
+          enum: [ WAREHOUSE, STORE, UNKNOWN ]
+          example: WAREHOUSE
+        nodeAdmin:
+          type: string
+          enum: [ PARIS, EASY, BXP, SELLER, COPEC, JUMBO, OTHERS]
+          example: PARIS
+        availableLogisticModels:
+          type: array
+          items:
+            type: string
+            enum: [ OWNED, FULFILLMENT_BY, DROP_SHIPPING, FLEX ]
+            example: OWNED
+        availableShippingCapabilities:
+          type: array
+          items:
+            type: string
+            enum: [ HOME_DELIVERY, CLICK_AND_COLLECT, EXTERNAL_PICKUP, PICKUP_COPEC, SHIP_FROM_STORE, BOPIS, CROSSDOCKING ]
+            example: HOME_DELIVERY
+        availableShippingOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingOptionsRepresentation'
+        sellerType:
+          $ref: '#/components/schemas/SellerType'
+        logisticSize:
+          $ref: '#/components/schemas/LogisticSize'
+        productClassification:
+          $ref: '#/components/schemas/ProductClassification'
+        bundleComponents:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleComponents'
+    ShippingOptionsRepresentation:
+      type: object
+      required:
+        - shippingType
+        - shippingSubType
+        - shippingMethods
+      properties:
+        shippingType:
+          type: string
+          enum: [ COLLECT, DELIVERY ]
+          example: DELIVERY
+        shippingSubType:
+          type: string
+          enum: [ HOME, IN_STORE, COPEC, EXTERNAL ]
+          example: HOME
+        shippingMethods:
+          type: array
+          items:
+            type: string
+            enum: [ SAME_DAY, NEXT_DAY, DATE_RANGE, SCHEDULED ]
+            example: SAME_DAY
+  requestBodies:
+    ItemShippingOptionsDraft:
+      description: Fetch Logistic Item Shipping Options for list of ItemIds and NodeCodes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemShippingOptionsDraft'
+  responses:
+    ItemsShippingOptionsRepresentation:
+      description: Shipping options for given Item ID and node code combinations
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemsShippingOptionsRepresentation'

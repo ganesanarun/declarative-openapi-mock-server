@@ -55,7 +55,7 @@ const evaluateRule = (value, rule) => {
             return value > rule.value;
         case 'eq':
         default:
-            return value === rule.value;
+            return _.isEqual(value, rule.value);
     }
 };
 
