@@ -34,12 +34,11 @@ paths:
             rules:
               - field: items
                 value: {
-                  "id": "146711002",
                   "nodeCode": "100"
                 }
                 location: body
                 arrayOperator: any
-                operator: eq
+                operator: match
             response:
               body: {
                 "meta": {

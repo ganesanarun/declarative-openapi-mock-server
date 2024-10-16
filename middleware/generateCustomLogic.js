@@ -53,6 +53,8 @@ const evaluateRule = (value, rule) => {
             return value < rule.value;
         case 'gt':
             return value > rule.value;
+        case 'match':
+            return _.isMatch(value, rule.value);
         case 'eq':
         default:
             return _.isEqual(value, rule.value);
